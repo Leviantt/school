@@ -16,7 +16,12 @@ export class User extends Document implements IUser {
   @Prop({ required: true })
   passwordHash: string;
 
-  @Prop({ required: true, enum: UserRole, default: UserRole.Student })
+  @Prop({
+    required: true,
+    enum: UserRole,
+    default: UserRole.Student,
+    type: String,
+  })
   role: UserRole;
 }
 
