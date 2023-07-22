@@ -1,5 +1,5 @@
 import { IUser, UserRole } from '@school/interfaces';
-import {compare, genSalt, hash} from 'bcrypt';
+import { compare, genSalt, hash } from 'bcrypt';
 
 export class UserEntity implements IUser {
   _id: string;
@@ -11,6 +11,7 @@ export class UserEntity implements IUser {
   constructor(user: IUser) {
     this._id = user._id;
     this.displayName = user.displayName;
+    this.passwordHash = user.passwordHash;
     this.email = user.email;
     this.role = user.role;
   }

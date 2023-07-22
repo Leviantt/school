@@ -4,8 +4,6 @@ import { IUser, UserRole } from '@school/interfaces';
 
 @Schema()
 export class User extends Document implements IUser {
-  @Prop()
-  _id?: string;
 
   @Prop()
   displayName?: string;
