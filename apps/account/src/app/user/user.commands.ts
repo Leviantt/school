@@ -1,10 +1,6 @@
 import { Body, Controller } from '@nestjs/common';
 import { RMQRoute, RMQValidate } from 'nestjs-rmq';
-import {
-  AccountChangeProfile,
-  AccountUserCourses,
-  AccountUserInfo,
-} from '@school/contracts';
+import { AccountChangeProfile } from '@school/contracts';
 import { UserRepository } from './repositories/user.repository';
 import { UserEntity } from './entities/user.entity';
 
