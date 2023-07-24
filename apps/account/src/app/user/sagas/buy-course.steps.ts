@@ -3,7 +3,7 @@ import { UserEntity } from '../entities/user.entity';
 import {
   CourseGetCourse,
   PaymentCheck,
-  PaymentGenerateLink,
+  PaymentGenerateLink, PaymentStatus,
 } from '@school/contracts';
 import { PurchaseState } from '@school/interfaces';
 
@@ -34,7 +34,7 @@ export class BuyCourseSagaStateStarted extends BuyCourseSagaState {
     return { paymentLink, user: this.saga.user };
   }
 
-  public checkPayment(): Promise<{ user: UserEntity }> {
+  public checkPayment(): Promise<{ user: UserEntity, status: PaymentStatus }> {
     throw new Error('Could not check payment that is not started.');
   }
 
@@ -49,7 +49,7 @@ export class BuyCourseSagaStateWaitingForPayment extends BuyCourseSagaState {
     throw new Error('Cannot pay course that is already in a paying process.');
   }
 
-  public async checkPayment(): Promise<{ user: UserEntity }> {
+  public async checkPayment(): Promise<{ user: UserEntity, status: PaymentStatus }> {
     const { status } = await this.saga.rmqService.send<
       PaymentCheck.Request,
       PaymentCheck.Response
@@ -60,15 +60,15 @@ export class BuyCourseSagaStateWaitingForPayment extends BuyCourseSagaState {
 
     if (status === 'canceled') {
       this.saga.setState(PurchaseState.Canceled, this.saga.courseId);
-      return { user: this.saga.user };
+      return { user: this.saga.user, status: 'canceled' };
     }
 
     if (status !== 'success') {
-      return { user: this.saga.user };
+      return { user: this.saga.user, status: 'progress' };
     }
 
     this.saga.setState(PurchaseState.Purchased, this.saga.courseId);
-    return { user: this.saga.user };
+    return { user: this.saga.user, status: 'success' };
   }
 
   public cancel(): Promise<{ user: UserEntity }> {
@@ -83,7 +83,7 @@ export class BuyCourseSagaStatePurchased extends BuyCourseSagaState {
     throw new Error('Cannot pay course that is already purchased.');
   }
 
-  checkPayment(): Promise<{ user: UserEntity }> {
+  checkPayment(): Promise<{ user: UserEntity, status: PaymentStatus }> {
     throw new Error(
       'Cannot check payment of a course that is already purchased.'
     );
@@ -100,7 +100,7 @@ export class BuyCourseSagaStateCanceled extends BuyCourseSagaState {
     return this.saga.getState().pay();
   }
 
-  checkPayment(): Promise<{ user: UserEntity }> {
+  checkPayment(): Promise<{ user: UserEntity, status: PaymentStatus }> {
     throw new Error('Cannot check payment of a course that is canceled.');
   }
 
