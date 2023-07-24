@@ -1,5 +1,4 @@
-import {IsNumber, IsString} from 'class-validator';
-import { ICourse } from '@school/interfaces';
+import { IsNumber, IsString } from 'class-validator';
 
 export namespace PaymentGenerateLink {
   export const topic = 'payment.generate-link.command';

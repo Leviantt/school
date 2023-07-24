@@ -23,28 +23,29 @@ export class UserEntity implements IUser {
     this.courses = user.courses;
   }
 
-  public addCourse(courseId: string) {
+  public setCoursePurchaseState(
+    courseId: string,
+    purchaseState: PurchaseState
+  ) {
     const courseExists = this.courses.find((c) => c._id === courseId);
-    if (courseExists) {
-      throw new Error('Course to add is already added.');
+    if (!courseExists) {
+      this.courses.push({
+        courseId,
+        purchaseState,
+      });
+      return this;
     }
-    this.courses.push({
-      courseId,
-      purchaseState: PurchaseState.Started,
-    });
-  }
-
-  public deleteCourse(courseId: string) {
-    this.courses = this.courses.filter((c) => c._id !== courseId);
-  }
-
-  public updateCoursePurchaseState(courseId: string, purchaseState: PurchaseState) {
+    if (purchaseState === PurchaseState.Canceled) {
+      this.courses = this.courses.filter((c) => c._id !== courseId);
+      return this;
+    }
     this.courses = this.courses.map((c) => {
       if (c._id === courseId) {
         return { ...c, purchaseState };
       }
       return c;
     });
+    return this;
   }
 
   public getPublicProfile() {
