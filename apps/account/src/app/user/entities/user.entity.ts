@@ -5,6 +5,8 @@ import {
   UserRole,
 } from '@school/interfaces';
 import { compare, genSalt, hash } from 'bcrypt';
+import { IDomainEvent } from '@school/interfaces';
+import { AccountChangedCourse } from '@school/contracts';
 
 export class UserEntity implements IUser {
   _id: string;
@@ -13,6 +15,7 @@ export class UserEntity implements IUser {
   passwordHash: string;
   role: UserRole;
   courses?: IUserCourse[];
+  events: IDomainEvent[] = [];
 
   constructor(user: IUser) {
     this._id = user._id;
@@ -44,6 +47,14 @@ export class UserEntity implements IUser {
         return { ...c, purchaseState };
       }
       return c;
+    });
+    this.events.push({
+      topic: AccountChangedCourse.topic,
+      data: {
+        courseId,
+        userId: this._id,
+        state: purchaseState,
+      },
     });
     return this;
   }
