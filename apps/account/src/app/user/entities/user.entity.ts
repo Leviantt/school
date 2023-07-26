@@ -1,11 +1,11 @@
 import {
+  IDomainEvent,
   IUser,
   IUserCourse,
   PurchaseState,
   UserRole,
 } from '@school/interfaces';
 import { compare, genSalt, hash } from 'bcrypt';
-import { IDomainEvent } from '@school/interfaces';
 import { AccountChangedCourse } from '@school/contracts';
 
 export class UserEntity implements IUser {
@@ -65,6 +65,13 @@ export class UserEntity implements IUser {
       role: this.role,
       displayName: this.displayName,
     };
+  }
+
+  public getCourseState(courseId: string): PurchaseState {
+    return (
+      this.courses.find((c) => c.courseId === courseId)?.purchaseState ??
+      PurchaseState.Started
+    );
   }
 
   public async setPassword(password: string): Promise<this> {
